@@ -13,6 +13,7 @@ Module.register("MMM-WebcamImage", {
 
   start() {
     this.blobUrl = null
+    this.loading = true
 
     if (this.config.url) {
       this.fetchImage()
@@ -35,6 +36,8 @@ Module.register("MMM-WebcamImage", {
       if (this.config.width) { img.style.width = this.config.width }
       if (this.config.height) { img.style.height = this.config.height }
       wrapper.appendChild(img)
+    } else if (this.loading) {
+      wrapper.innerText = "Loading..."
     }
 
     return wrapper
@@ -46,6 +49,7 @@ Module.register("MMM-WebcamImage", {
       .then((blob) => {
         const prevBlobUrl = this.blobUrl
         this.blobUrl = URL.createObjectURL(blob)
+        this.loading = false
         this.updateDom()
         if (prevBlobUrl) { URL.revokeObjectURL(prevBlobUrl) }
       })
