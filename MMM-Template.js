@@ -60,5 +60,5 @@ Module.register("MMM-Template", {
       this.templateContent = `${this.config.exampleContent} ${payload}`
       this.updateDom()
     }
-  }
+  },
 })

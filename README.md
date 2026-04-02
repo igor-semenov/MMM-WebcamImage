@@ -1,15 +1,10 @@
-# MMM-Template
-Use this template for creating new MagicMirror² modules.
+# MMM-WebcamImage
 
-See the [wiki page](https://github.com/Dennis-Rosenbaum/MMM-Template/wiki) for an in depth overview of how to get started.
-
-# MMM-Template
-
-*MMM-Template* is a module for [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) that displays ... [Module description]
+*MMM-WebcamImage* is a module for [MagicMirror²](https://github.com/MagicMirrorOrg/MagicMirror) that periodically fetches and displays an image from a given URL, bypassing browser cache on every refresh.
 
 ## Screenshot
 
-![Example of MMM-Template](./example_1.png)
+![Example of MMM-WebcamImage](./example_1.png)
 
 ## Installation
 
@@ -19,7 +14,7 @@ In your terminal, go to the modules directory and clone the repository:
 
 ```bash
 cd ~/MagicMirror/modules
-git clone [GitHub url]
+git clone https://github.com/igor-semenov/MMM-WebcamImage
 ```
 
 ### Update
@@ -27,54 +22,59 @@ git clone [GitHub url]
 Go to the module directory and pull the latest changes:
 
 ```bash
-cd ~/MagicMirror/modules/MMM-Template
+cd ~/MagicMirror/modules/MMM-WebcamImage
 git pull
 ```
 
 ## Configuration
 
-To use this module, you have to add a configuration object to the modules array in the `config/config.js` file.
+To use this module, add a configuration object to the modules array in `config/config.js`.
 
 ### Example configuration
 
-Minimal configuration to use the module:
+Minimal configuration:
 
 ```js
-    {
-        module: 'MMM-Template',
-        position: 'lower_third'
-    },
+{
+    module: "MMM-WebcamImage",
+    position: "top_right",
+    config: {
+        url: "http://example.com/webcam.jpg"
+    }
+},
 ```
 
 Configuration with all options:
 
 ```js
-    {
-        module: 'MMM-Template',
-        position: 'lower_third',
-        config: {
-            exampleContent: 'Welcome world'
-        }
-    },
+{
+    module: "MMM-WebcamImage",
+    position: "top_right",
+    config: {
+        url: "http://example.com/webcam.jpg",
+        refreshInterval: 1000,
+        width: "400px",
+        height: "300px"
+    }
+},
 ```
 
 ### Configuration options
 
 Option|Possible values|Default|Description
 ------|------|------|-----------
-`exampleContent`|`string`|not available|The content to show on the page
-
-## Sending notifications to the module
-
-Notification|Description
-------|-----------
-`TEMPLATE_RANDOM_TEXT`|Payload must contain the text that needs to be shown on this module
+`url`|`string`|`""`|URL of the image to display
+`refreshInterval`|`number`|`1000`|Refresh interval in milliseconds
+`width`|`string` or `null`|`null`|CSS width of the image (e.g. `"400px"`). If `null`, the image's natural width is used
+`height`|`string` or `null`|`null`|CSS height of the image (e.g. `"300px"`). If `null`, the image's natural height is used
 
 ## Developer commands
 
 - `npm install` - Install devDependencies like ESLint.
 - `node --run lint` - Run linting and formatter checks.
 - `node --run lint:fix` - Fix linting and formatter issues.
+- `./check.sh` - Run all quality checks locally.
+- `./check.sh --fix` - Run quality checks and auto-fix issues.
 
 ## License
 
