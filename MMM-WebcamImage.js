@@ -12,7 +12,7 @@ Module.register("MMM-WebcamImage", {
   },
 
   start() {
-    this.blobUrl = null
+    this.dataUrl = null
     this.loading = true
     this.error = null
 
@@ -31,9 +31,9 @@ Module.register("MMM-WebcamImage", {
       return wrapper
     }
 
-    if (this.blobUrl) {
+    if (this.dataUrl) {
       const img = document.createElement("img")
-      img.src = this.blobUrl
+      img.src = this.dataUrl
       if (this.config.width) { img.style.width = this.config.width }
       if (this.config.height) { img.style.height = this.config.height }
       wrapper.appendChild(img)
@@ -46,27 +46,21 @@ Module.register("MMM-WebcamImage", {
     return wrapper
   },
 
+  socketNotificationReceived(notification, payload) {
+    if (notification === "IMAGE_DATA") {
+      this.dataUrl = payload.dataUrl
+      this.loading = false
+      this.error = null
+      this.updateDom()
+    } else if (notification === "IMAGE_ERROR") {
+      this.error = payload.message
+      this.loading = false
+      Log.error("MMM-WebcamImage error:", payload.message)
+      this.updateDom()
+    }
+  },
+
   fetchImage() {
-    fetch(this.config.url, { cache: "no-store" })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status} ${response.statusText}`)
-        }
-        return response.blob()
-      })
-      .then((blob) => {
-        const prevBlobUrl = this.blobUrl
-        this.blobUrl = URL.createObjectURL(blob)
-        this.loading = false
-        this.error = null
-        this.updateDom()
-        if (prevBlobUrl) { URL.revokeObjectURL(prevBlobUrl) }
-      })
-      .catch((error) => {
-        this.error = error.message
-        this.loading = false
-        Log.error("MMM-WebcamImage fetch error:", error)
-        this.updateDom()
-      })
+    this.sendSocketNotification("FETCH_IMAGE", { url: this.config.url })
   },
 })
