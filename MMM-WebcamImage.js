@@ -14,6 +14,7 @@ Module.register("MMM-WebcamImage", {
   start() {
     this.blobUrl = null
     this.loading = true
+    this.error = null
 
     if (this.config.url) {
       this.fetchImage()
@@ -36,6 +37,8 @@ Module.register("MMM-WebcamImage", {
       if (this.config.width) { img.style.width = this.config.width }
       if (this.config.height) { img.style.height = this.config.height }
       wrapper.appendChild(img)
+    } else if (this.error) {
+      wrapper.innerText = `MMM-WebcamImage error: ${this.error}`
     } else if (this.loading) {
       wrapper.innerText = "Loading..."
     }
@@ -45,14 +48,25 @@ Module.register("MMM-WebcamImage", {
 
   fetchImage() {
     fetch(this.config.url, { cache: "no-store" })
-      .then(response => response.blob())
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} ${response.statusText}`)
+        }
+        return response.blob()
+      })
       .then((blob) => {
         const prevBlobUrl = this.blobUrl
         this.blobUrl = URL.createObjectURL(blob)
         this.loading = false
+        this.error = null
         this.updateDom()
         if (prevBlobUrl) { URL.revokeObjectURL(prevBlobUrl) }
       })
-      .catch(error => Log.error("MMM-WebcamImage fetch error:", error))
+      .catch((error) => {
+        this.error = error.message
+        this.loading = false
+        Log.error("MMM-WebcamImage fetch error:", error)
+        this.updateDom()
+      })
   },
 })
