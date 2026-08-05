@@ -139,16 +139,19 @@ fi
 if [ "$FIX_MODE" = true ]; then
     print_section "Running security audit (with auto-fix)"
     echo "Attempting to fix vulnerabilities..."
-    FIX_OUTPUT=$(npm audit fix 2>&1)
+    FIX_OUTPUT=$(npm audit fix 2>&1) || true
     echo "$FIX_OUTPUT"
 
-    AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1)
-    AUDIT_EXIT_CODE=$?
+    if AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1); then
+        AUDIT_EXIT_CODE=0
+    else
+        AUDIT_EXIT_CODE=$?
+    fi
 
     if [ $AUDIT_EXIT_CODE -eq 0 ]; then
         print_success "All vulnerabilities fixed"
     else
-        VULN_COUNT=$(echo "$AUDIT_OUTPUT" | grep -oP '\d+(?= vulnerabilities)' | head -1)
+        VULN_COUNT=$(echo "$AUDIT_OUTPUT" | grep -oP '^\d+(?=.*vulnerabilit)' | head -1)
         if [ -n "$VULN_COUNT" ] && [ "$VULN_COUNT" -gt 0 ]; then
             print_warning "Still found $VULN_COUNT vulnerabilities (may require manual fix)"
             echo "$AUDIT_OUTPUT" | grep -A 5 "Severity:"
@@ -156,13 +159,16 @@ if [ "$FIX_MODE" = true ]; then
     fi
 else
     print_section "Running security audit"
-    AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1)
-    AUDIT_EXIT_CODE=$?
+    if AUDIT_OUTPUT=$(npm audit --audit-level=moderate 2>&1); then
+        AUDIT_EXIT_CODE=0
+    else
+        AUDIT_EXIT_CODE=$?
+    fi
 
     if [ $AUDIT_EXIT_CODE -eq 0 ]; then
         print_success "No security vulnerabilities found"
     else
-        VULN_COUNT=$(echo "$AUDIT_OUTPUT" | grep -oP '\d+(?= vulnerabilities)' | head -1)
+        VULN_COUNT=$(echo "$AUDIT_OUTPUT" | grep -oP '^\d+(?=.*vulnerabilit)' | head -1)
         if [ -n "$VULN_COUNT" ] && [ "$VULN_COUNT" -gt 0 ]; then
             print_warning "Found $VULN_COUNT vulnerabilities"
             echo "$AUDIT_OUTPUT" | grep -A 5 "Severity:"
