@@ -22,7 +22,7 @@
   },
   "homepage": "[GitHub url]#readme",
   "devDependencies": {
-    "@eslint/css": "^1.1.0",
+    "@eslint/css": "^2.0.0",
     "@eslint/js": "^10.0.1",
     "@eslint/markdown": "^8.0.1",
     "@stylistic/eslint-plugin": "^5.1.0",
